@@ -1,0 +1,4 @@
+[runtime]
+# 匿名の利用統計送信を無効化
+dlthub_telemetry = false
+log_level = "WARNING"

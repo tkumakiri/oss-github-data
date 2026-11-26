@@ -1,0 +1,37 @@
+# 取得対象リポジトリ（owner/name）
+# 追加・削除はこのファイルを編集するだけ。新規追加分は初回のみ直近 INITIAL_LOOKBACK_DAYS 日の Issue/PR を取得する。
+# 超大規模リポジトリ（pytorch, rust, kubernetes, vscode, cpython 等）は容量の推移を見てから追加する（docs/adr/0002 参照）。
+repositories:
+  # データ基盤・変換
+  - dbt-labs/dbt-core
+  - dlt-hub/dlt
+  - apache/airflow
+  - dagster-io/dagster
+  - PrefectHQ/prefect
+  # DB・クエリエンジン
+  - duckdb/duckdb
+  - ClickHouse/ClickHouse
+  - trinodb/trino
+  - apache/spark
+  # データフォーマット・ライブラリ
+  - apache/arrow
+  - apache/iceberg
+  - delta-io/delta
+  - pola-rs/polars
+  - pandas-dev/pandas
+  # BI
+  - lightdash/lightdash
+  - metabase/metabase
+  - evidence-dev/evidence
+  # フロントエンド
+  - facebook/react
+  - vercel/next.js
+  - vuejs/core
+  - sveltejs/svelte
+  - microsoft/TypeScript
+  # バックエンド・ツール
+  - fastapi/fastapi
+  - django/django
+  - astral-sh/uv
+  # AI/ML
+  - huggingface/transformers

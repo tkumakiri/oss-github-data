@@ -1,0 +1,55 @@
+name: ingest
+
+on:
+  schedule:
+    # 毎日 06:17 JST（21:17 UTC）。毎時0分付近は混雑し遅延・スキップが起きやすいので避ける
+    - cron: "17 21 * * *"
+  workflow_dispatch:
+    inputs:
+      only_repos:
+        description: "対象を絞る場合のみ（カンマ区切り owner/name）"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ingest
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Ingest GitHub data
+        run: uv run python ingest/github_pipeline.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ONLY_REPOS: ${{ inputs.only_repos }}
+
+      - name: Record repository size
+        run: |
+          echo "$(date -u +%F),$(du -sk data/raw | cut -f1),$(du -sk .git | cut -f1)" >> data/_meta/repo_size.csv
+          tail -n 1 data/_meta/repo_size.csv
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data
+          if git diff --cached --quiet; then
+            echo "no changes"
+            exit 0
+          fi
+          git commit -m "data: ingest $(date -u +%F)"
+          git pull --rebase
+          git push
