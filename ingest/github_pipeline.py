@@ -73,8 +73,17 @@ def _respect_rate_limit(response: Any) -> None:
     time.sleep(wait)
 
 
+def _drop_fields(value: Any) -> Any:
+    """ネストした dict / list の中も含めて DROP_FIELDS を除外する。"""
+    if isinstance(value, dict):
+        return {k: _drop_fields(v) for k, v in value.items() if k not in DROP_FIELDS}
+    if isinstance(value, list):
+        return [_drop_fields(v) for v in value]
+    return value
+
+
 def _clean(record: dict[str, Any], repo: str, extracted_at: str) -> dict[str, Any]:
-    out = {k: v for k, v in record.items() if k not in DROP_FIELDS}
+    out = _drop_fields(record)
     out["_repo_full_name"] = repo
     out["_extracted_at"] = extracted_at
     return out
